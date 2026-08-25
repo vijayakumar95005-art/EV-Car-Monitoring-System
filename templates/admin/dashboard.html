@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ============================= -->
+<!-- SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+            <span>Admin Panel</span>
+        </div>
+
+    </div>
+
+
+<nav>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="active">
+        <span>📊</span>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="/admin/vehicles">
+        <span>🚗</span>
+        <span>Vehicles</span>
+    </a>
+
+    <a href="/admin/maintenance">
+        <span>🔧</span>
+        <span>Maintenance</span>
+    </a>
+
+    <a href="/admin/revenue">
+        <span>💰</span>
+        <span>Revenue</span>
+    </a>
+
+    <a href="/admin/electricity">
+        <span>⚡</span>
+        <span>Electricity</span>
+    </a>
+
+    <a href="{{ url_for('admin_driver_behaviour') }}">
+        <span>👨‍✈️</span>
+        <span>Driver Behaviour</span>
+    </a>
+
+    
+</nav>
+
+    <div class="sidebar-bottom">
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ============================= -->
+<!-- MAIN CONTENT -->
+<!-- ============================= -->
+
+<main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>Admin Dashboard</h1>
+
+            <p>
+                Continuous EV Fleet Monitoring
+            </p>
+
+        </div>
+
+
+        <div class="admin-topbar-actions">
+
+            <div class="notification-wrap">
+                <button type="button" class="notification-button" id="notificationButton" aria-label="Open alerts" aria-expanded="false">
+                    <span aria-hidden="true">🔔</span>
+                    <span class="notification-count" id="notificationCount" hidden>0</span>
+                </button>
+
+                <div class="notification-panel" id="notificationPanel" hidden>
+                    <div class="notification-header">
+                        <strong>Alerts</strong>
+                        <span id="notificationSummary">No alerts</span>
+                    </div>
+                    <div id="notificationList"></div>
+                </div>
+            </div>
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>Admin</strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+        </div>
+
+    </header>
+
+    <section class="panel full-panel alert-details-panel" id="alertDetailsPanel" hidden>
+        <div class="panel-header">
+            <div>
+                <h2 id="alertDetailsTitle">Alert Details</h2>
+                <p id="alertDetailsSummary">Select an alert category to view details</p>
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead id="alertDetailsHead"></thead>
+                <tbody id="alertDetailsBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+
+
+   <!-- ========================================== -->
+<!-- FLEET STATUS -->
+<!-- ========================================== -->
+
+<section class="fleet-status-section">
+
+    <div class="section-heading">
+
+        <h2>Fleet Status</h2>
+
+        <p>
+            Current status of all electric vehicles
+        </p>
+
+    </div>
+
+
+    <!-- FLEET STATUS BOXES -->
+
+    <div class="fleet-status-grid">
+
+
+        <!-- TOTAL VEHICLES -->
+
+        <div class="fleet-status-card" data-status="all" tabindex="0" role="button">
+
+            <div class="fleet-icon total-icon">
+                🚗
+            </div>
+
+            <div class="fleet-info">
+
+                <span class="fleet-label">
+                    Total Vehicles
+                </span>
+
+                <h3 id="totalVehicles">
+                    0
+                </h3>
+
+                <p>
+                    Total fleet
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- GARAGE -->
+
+        <div class="fleet-status-card" data-status="garage" tabindex="0" role="button">
+
+            <div class="fleet-icon garage-icon">
+                🔧
+            </div>
+
+            <div class="fleet-info">
+
+                <span class="fleet-label">
+                    Garage
+                </span>
+
+                <h3 id="garageVehicles">
+                    0
+                </h3>
+
+                <p>
+                    Vehicles in garage
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CHARGING -->
+
+        <div class="fleet-status-card" data-status="charging" tabindex="0" role="button">
+
+            <div class="fleet-icon charging-icon">
+                ⚡
+            </div>
+
+            <div class="fleet-info">
+
+                <span class="fleet-label">
+                    Charging
+                </span>
+
+                <h3 id="chargingVehicles">
+                    0
+                </h3>
+
+                <p>
+                    Vehicles charging
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- RUNNING -->
+
+        <div class="fleet-status-card" data-status="running" tabindex="0" role="button">
+
+            <div class="fleet-icon running-icon">
+                🚙
+            </div>
+
+            <div class="fleet-info">
+
+                <span class="fleet-label">
+                    Running
+                </span>
+
+                <h3 id="runningVehicles">
+                    0
+                </h3>
+
+                <p>
+                    Vehicles running
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+<section class="panel full-panel fleet-details-panel" id="fleetDetailsPanel" hidden>
+
+    <div class="panel-header">
+        <div>
+            <h2 id="fleetDetailsTitle">Vehicle Details</h2>
+            <p id="fleetDetailsSummary">Select a fleet status to view its vehicles</p>
+        </div>
+        <button type="button" class="panel-toggle" id="fleetDetailsToggle" aria-expanded="true" aria-controls="fleetDetailsTable">
+            <span aria-hidden="true">⌃</span>
+            <span>Collapse</span>
+        </button>
+    </div>
+
+    <div class="table-container" id="fleetDetailsTable">
+        <table>
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>Make / Model</th>
+                    <th>Driver</th>
+                    <th>Battery</th>
+                    <th>Speed</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="fleetDetailsBody"></tbody>
+        </table>
+    </div>
+
+</section>
+
+
+
+    <!-- ============================= -->
+    <!-- ELECTRICITY -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>⚡ Electricity Consumption</h2>
+
+                <p>
+                    Vehicles with highest electricity consumption
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Vehicle</th>
+
+                        <th>Make</th>
+
+                        <th>Distance</th>
+
+                        <th>Electricity</th>
+
+                        <th>Efficiency</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="electricityTableBody">
+
+    <tr>
+        <td colspan="6" style="text-align:center;">
+            Loading electricity data...
+        </td>
+    </tr>
+
+</tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- DRIVER BEHAVIOUR -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>👨‍✈️ Driver Behaviour</h2>
+
+                <p>
+                    Driving behaviour and safety monitoring
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Driver</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Speed Limit</th>
+
+                        <th>Max Speed</th>
+
+                        <th>Overspeed</th>
+
+                        <th>Rash Driving</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr>
+
+                        <td>
+                            Driver 001
+                        </td>
+
+                        <td>
+                            EV101
+                        </td>
+
+                        <td>
+                            80 km/h
+                        </td>
+
+                        <td>
+                            92 km/h
+                        </td>
+
+                        <td>
+                            2
+                        </td>
+
+                        <td>
+                            <span class="status-normal">
+                                Low
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            Driver 002
+                        </td>
+
+                        <td>
+                            EV102
+                        </td>
+
+                        <td>
+                            80 km/h
+                        </td>
+
+                        <td>
+                            115 km/h
+                        </td>
+
+                        <td>
+                            8
+                        </td>
+
+                        <td>
+                            <span class="status-danger">
+                                High
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            Driver 003
+                        </td>
+
+                        <td>
+                            EV103
+                        </td>
+
+                        <td>
+                            80 km/h
+                        </td>
+
+                        <td>
+                            78 km/h
+                        </td>
+
+                        <td>
+                            0
+                        </td>
+
+                        <td>
+                            <span class="status-normal">
+                                Safe
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<script>
+
+async function loadDashboardData() {
+
+    try {
+
+        const response = await fetch("/api/dashboard");
+
+        if (!response.ok) {
+            throw new Error("Dashboard API not available");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("totalVehicles").textContent =
+            data.total_vehicles ?? "--";
+
+        document.getElementById("garageVehicles").textContent =
+            data.garage_vehicles ?? "--";
+
+        document.getElementById("chargingVehicles").textContent =
+            data.charging_vehicles ?? "--";
+
+        document.getElementById("runningVehicles").textContent =
+            data.running_vehicles ?? "--";
+
+    } catch (error) {
+
+        console.log("Dashboard database connection not available yet.");
+
+    }
+
+}
+
+loadDashboardData();
+
+</script>
+
+<script>
+let adminAlertData = { low_battery: [], rash_driving: [] };
+
+async function loadAdminAlerts() {
+    const list = document.getElementById("notificationList");
+    const count = document.getElementById("notificationCount");
+    const summary = document.getElementById("notificationSummary");
+    try {
+        const response = await fetch("/api/admin-alerts");
+        if (!response.ok) throw new Error("Unable to load alerts");
+        const data = await response.json();
+        const totalAlerts = data.low_battery.length + data.rash_driving.length;
+        adminAlertData = data;
+        count.textContent = totalAlerts;
+        count.hidden = totalAlerts === 0;
+        summary.textContent = totalAlerts ? `${totalAlerts} active alert(s)` : "No alerts";
+        list.innerHTML = "";
+
+        if (!totalAlerts) {
+            const empty = document.createElement("p");
+            empty.className = "notification-empty";
+            empty.textContent = "No low battery or rash driving alerts.";
+            list.appendChild(empty);
+            return;
+        }
+
+        addNotificationGroup(list, "low_battery", "Low battery", data.low_battery,
+            `${data.low_battery.length} vehicle(s) below 20%`, "warning");
+        addNotificationGroup(list, "rash_driving", "Rash driving", data.rash_driving,
+            `${data.rash_driving.length} event(s) detected`, "danger");
+    } catch (error) {
+        console.error("Admin alerts loading error:", error);
+    }
+}
+
+function addNotificationGroup(container, category, titleText, records, summaryText, type) {
+    const group = document.createElement("div");
+    group.className = `notification-group ${type}`;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "notification-group-button";
+    button.setAttribute("aria-expanded", "false");
+    const title = document.createElement("strong");
+    title.textContent = titleText;
+    const summary = document.createElement("span");
+    summary.textContent = summaryText;
+    const arrow = document.createElement("span");
+    arrow.className = "notification-group-arrow";
+    arrow.textContent = "⌄";
+    button.append(title, summary, arrow);
+
+    const recordsList = document.createElement("div");
+    recordsList.className = "notification-records";
+    recordsList.hidden = true;
+    records.forEach(record => {
+        const recordItem = document.createElement("div");
+        recordItem.className = "notification-record";
+        const vehicle = document.createElement("strong");
+        vehicle.textContent = record.vehicle_number || "Unknown vehicle";
+        const detail = document.createElement("span");
+        detail.textContent = category === "low_battery"
+            ? `${Number(record.battery_percentage).toFixed(1)}% battery`
+            : `${record.driver_name || "Unknown driver"} - ${Number(record.speed || 0).toFixed(1)} km/h`;
+        recordItem.append(vehicle, detail);
+        recordsList.appendChild(recordItem);
+    });
+
+    button.addEventListener("click", () => {
+        const expanded = recordsList.hidden;
+        recordsList.hidden = !expanded;
+        button.setAttribute("aria-expanded", String(expanded));
+        arrow.textContent = expanded ? "⌃" : "⌄";
+    });
+    group.append(button, recordsList);
+    container.appendChild(group);
+}
+
+const notificationButton = document.getElementById("notificationButton");
+const notificationPanel = document.getElementById("notificationPanel");
+notificationButton.addEventListener("click", () => {
+    const isHidden = notificationPanel.hidden;
+    notificationPanel.hidden = !isHidden;
+    notificationButton.setAttribute("aria-expanded", String(isHidden));
+});
+
+loadAdminAlerts();
+</script>
+
+<script>
+function showAlertDetails(type) {
+    const panel = document.getElementById("alertDetailsPanel");
+    const head = document.getElementById("alertDetailsHead");
+    const body = document.getElementById("alertDetailsBody");
+    const title = document.getElementById("alertDetailsTitle");
+    const summary = document.getElementById("alertDetailsSummary");
+    const lowBattery = type === "low_battery";
+    const rashDriving = type === "rash_driving";
+    const records = type === "all"
+        ? [...adminAlertData.low_battery, ...adminAlertData.rash_driving]
+        : lowBattery ? adminAlertData.low_battery : adminAlertData.rash_driving;
+
+    title.textContent = type === "all"
+        ? "All Alerts"
+        : lowBattery ? "Low Battery Vehicles" : "Rash Driving Events";
+    summary.textContent = `${records.length} alert(s) found`;
+    head.innerHTML = "";
+    body.innerHTML = "";
+
+    const headings = type === "all"
+        ? ["Type", "Vehicle", "Driver", "Details", "Recorded"]
+        : lowBattery
+            ? ["Vehicle", "Make / Model", "Battery", "Recorded"]
+            : ["Vehicle", "Driver", "Speed", "Speed Limit", "Recorded"];
+    const headerRow = document.createElement("tr");
+    headings.forEach(value => {
+        const cell = document.createElement("th");
+        cell.textContent = value;
+        headerRow.appendChild(cell);
+    });
+    head.appendChild(headerRow);
+
+    if (!records.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = headings.length;
+        cell.textContent = "No alerts found";
+        cell.style.textAlign = "center";
+        row.appendChild(cell);
+        body.appendChild(row);
+    } else {
+        records.forEach(record => {
+            const row = document.createElement("tr");
+            const values = type === "all"
+                ? [
+                    lowBattery ? "Low battery" : "Rash driving",
+                    record.vehicle_number || "--",
+                    record.driver_name || "--",
+                    lowBattery
+                        ? `${Number(record.battery_percentage).toFixed(1)}% battery`
+                        : `${Number(record.speed || 0).toFixed(1)} km/h`,
+                    record.recorded_at || "--"
+                ]
+                : lowBattery
+                    ? [
+                        record.vehicle_number || "--",
+                        `${record.make || "--"} / ${record.model || "--"}`,
+                        `${Number(record.battery_percentage).toFixed(1)}%`,
+                        record.recorded_at || "--"
+                    ]
+                    : [
+                        record.vehicle_number || "--",
+                        record.driver_name || "--",
+                        `${Number(record.speed || 0).toFixed(1)} km/h`,
+                        `${Number(record.speed_limit || 0).toFixed(1)} km/h`,
+                        record.recorded_at || "--"
+                    ];
+            values.forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+            body.appendChild(row);
+        });
+    }
+
+    panel.hidden = false;
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+</script>
+
+<script>
+let fleetVehicles = [];
+
+async function loadFleetVehicles() {
+    const response = await fetch("/api/vehicles");
+    if (!response.ok) {
+        throw new Error("Unable to load vehicle details");
+    }
+    fleetVehicles = await response.json();
+}
+
+function showFleetDetails(status) {
+    const detailsPanel = document.getElementById("fleetDetailsPanel");
+    const detailsBody = document.getElementById("fleetDetailsBody");
+    const detailsTitle = document.getElementById("fleetDetailsTitle");
+    const detailsSummary = document.getElementById("fleetDetailsSummary");
+    const selectedVehicles = status === "all"
+        ? fleetVehicles
+        : fleetVehicles.filter(vehicle => vehicle.status === status);
+    const title = status === "all"
+        ? "All Vehicle Details"
+        : `${status.charAt(0).toUpperCase()}${status.slice(1)} Vehicles`;
+
+    detailsTitle.textContent = title;
+    detailsSummary.textContent = `${selectedVehicles.length} vehicle(s) found`;
+    detailsBody.innerHTML = "";
+    detailsPanel.hidden = false;
+    document.getElementById("fleetDetailsTable").hidden = false;
+    document.getElementById("fleetDetailsToggle").setAttribute("aria-expanded", "true");
+    document.getElementById("fleetDetailsToggle").innerHTML = '<span aria-hidden="true">⌃</span><span>Collapse</span>';
+
+    if (!selectedVehicles.length) {
+        detailsBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No vehicles found for this status</td></tr>';
+        detailsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
+
+    selectedVehicles.forEach(vehicle => {
+        const row = document.createElement("tr");
+        const values = [
+            vehicle.vehicle_number || "--",
+            `${vehicle.make || "--"} / ${vehicle.model || "--"}`,
+            vehicle.driver_name || "Not Assigned",
+            vehicle.battery_percentage == null ? "--" : `${Number(vehicle.battery_percentage).toFixed(1)}%`,
+            vehicle.speed == null ? "--" : `${Number(vehicle.speed).toFixed(1)} km/h`,
+            vehicle.city || "--",
+            vehicle.status || "--"
+        ];
+        values.forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+        detailsBody.appendChild(row);
+    });
+
+    detailsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.getElementById("fleetDetailsToggle").addEventListener("click", () => {
+    const table = document.getElementById("fleetDetailsTable");
+    const toggle = document.getElementById("fleetDetailsToggle");
+    const collapsed = table.hidden;
+    table.hidden = !collapsed;
+    toggle.setAttribute("aria-expanded", String(collapsed));
+    toggle.innerHTML = collapsed
+        ? '<span aria-hidden="true">⌃</span><span>Collapse</span>'
+        : '<span aria-hidden="true">⌄</span><span>Expand</span>';
+});
+
+async function initializeFleetDetails() {
+    try {
+        await loadFleetVehicles();
+        document.querySelectorAll(".fleet-status-card").forEach(card => {
+            const openDetails = () => showFleetDetails(card.dataset.status);
+            card.addEventListener("click", openDetails);
+            card.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openDetails();
+                }
+            });
+        });
+    } catch (error) {
+        console.error("Fleet details loading error:", error);
+    }
+}
+
+initializeFleetDetails();
+</script>
+
+
+<script>
+
+async function loadElectricityData() {
+
+    try {
+
+        const response = await fetch("/api/electricity");
+
+        if (!response.ok) {
+            throw new Error("Unable to load electricity data");
+        }
+
+        const records = await response.json();
+
+        const tableBody =
+            document.getElementById("electricityTableBody");
+
+        tableBody.innerHTML = "";
+
+        if (records.length === 0) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;">
+                        No electricity data found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        records.forEach(record => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+
+                <td>
+                    <strong>
+                        ${record.vehicle_number}
+                    </strong>
+                </td>
+
+                <td>
+                    ${record.make}
+                </td>
+
+                <td>
+                    ${Number(record.distance).toFixed(2)} km
+                </td>
+
+                <td>
+                    <strong>
+                        ${Number(record.electricity).toFixed(2)} kWh
+                    </strong>
+                </td>
+
+                <td>
+                    ${Number(record.efficiency).toFixed(2)} kWh/100km
+                </td>
+
+                <td>
+                    ${record.status}
+                </td>
+
+            `;
+
+            tableBody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Electricity loading error:",
+            error
+        );
+
+    }
+
+}
+
+loadElectricityData();
+
+</script>
+
+<script>
+async function loadDashboardDriverBehaviour() {
+    try {
+        const response = await fetch("/api/driver-behaviour");
+        if (!response.ok) throw new Error("Unable to load driver behaviour");
+        const records = await response.json();
+        const bodies = document.querySelectorAll(".panel table tbody");
+        const body = bodies[bodies.length - 1];
+        body.innerHTML = "";
+        if (!records.length) {
+            body.innerHTML = '<tr><td colspan="6" style="text-align:center;">No driver behaviour records found</td></tr>';
+            return;
+        }
+        records.slice(0, 5).forEach(record => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${record.driver_name}</td><td>${record.vehicle_number}</td>
+                <td>${record.speed_limit} km/h</td><td>${Number(record.average_speed || 0).toFixed(2)} km/h</td>
+                <td>${record.overspeed_events}</td>
+                <td><span class="status-normal">${record.status}</span></td>`;
+            body.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Dashboard driver behaviour loading error:", error);
+    }
+}
+
+loadDashboardDriverBehaviour();
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>VOLTRIX - Prediction</title>
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/driver.css') }}">
+
+</head>
+
+
+<body>
+
+<!-- ============================= -->
+<!-- DRIVER SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="driver-sidebar">
+
+    <!-- BRAND -->
+    <div class="driver-brand">
+
+        <!-- LIGHTNING ICON -->
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <!-- BRAND TEXT -->
+        <div class="brand-text">
+            <h2>VOLTRIX</h2>
+
+            <span>
+                Driver Panel
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+    <nav>
+
+        <!-- DASHBOARD -->
+        <a href="{{ url_for('driver_dashboard') }}">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <!-- PREDICTION -->
+        <a href="{{ url_for('driver_prediction') }}">
+
+            <span>🔮</span>
+            <span>Prediction</span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- BOTTOM -->
+    <div class="driver-sidebar-bottom">
+
+        <a href="{{ url_for('logout') }}">
+
+            <span>🚪</span>
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ============================= -->
+<!-- MAIN CONTENT -->
+<!-- ============================= -->
+
+<main class="driver-main">
+
+
+    <!-- HEADER -->
+
+    <header class="driver-topbar">
+
+        <div>
+
+            <h1>
+                EV Range Prediction
+            </h1>
+
+            <p>
+                Predict the estimated travel distance of an electric vehicle
+            </p>
+
+        </div>
+
+
+       <div class="driver-profile">
+
+    <div class="profile-icon">
+        D
+    </div>
+
+    <div>
+
+        <strong>
+            Driver
+        </strong>
+
+        <span>
+            Driver
+        </span>
+
+    </div>
+
+</div>
+    </header>
+
+
+
+    <!-- ============================= -->
+    <!-- PREDICTION INPUT -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🔮 Generate Prediction
+                </h2>
+
+                <p>
+                    Enter the current vehicle information
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="prediction-form">
+
+
+            <!-- VEHICLE -->
+
+            <div class="form-group">
+
+                <label>
+                    Select Vehicle
+                </label>
+
+                <select id="vehicle">
+
+                    <option value="">
+                        Select Vehicle
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- BATTERY -->
+
+            <div class="form-group">
+
+                <label>
+                    Battery Percentage
+                </label>
+
+                <div class="input-with-unit">
+
+                    <input
+                        type="number"
+                        id="battery"
+                        min="0"
+                        max="100"
+                        placeholder="Enter battery percentage"
+                    >
+
+                    <span>%</span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ROAD TYPE -->
+
+            <div class="form-group">
+
+                <label>
+                    Road Type
+                </label>
+
+                <select id="roadType" required>
+
+                    <option value="">
+                        Select Road Type
+                    </option>
+
+                    <option value="City">
+                        City
+                    </option>
+
+                    <option value="Highway">
+                        Highway
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="button"
+                id="predictionButton"
+                class="prediction-button"
+                onclick="generatePrediction()">
+
+                🔮 Generate Prediction
+
+            </button>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- RESULT -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    📊 Prediction Result
+                </h2>
+
+                <p>
+                    Estimated travel distance
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="prediction-result">
+
+
+            <div class="prediction-icon">
+                🚗
+            </div>
+
+
+            <div class="prediction-value">
+
+                <span>
+                    Estimated Travel Distance
+                </span>
+
+                <h3 id="predictionValue">
+                    -- km
+                </h3>
+
+                <p id="predictionMessage">
+                    Generate a prediction to view the result
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- RESULT DETAILS -->
+
+        <div class="prediction-details">
+
+
+            <div>
+
+                <span>
+                    Vehicle
+                </span>
+
+                <strong id="resultVehicle">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Battery
+                </span>
+
+                <strong id="resultBattery">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Road Type
+                </span>
+
+                <strong id="resultRoadType">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Status
+                </span>
+
+                <strong id="resultStatus">
+                    Waiting
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- PREDICTION HISTORY -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    📋 Prediction History
+                </h2>
+
+                <p>
+                    Previously generated predictions
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Vehicle</th>
+                        <th>Battery</th>
+                        <th>Road Type</th>
+                        <th>Predicted Distance</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="predictionTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ============================= -->
+<!-- TEMPORARY FRONTEND PREDICTION -->
+<!-- ============================= -->
+
+<script>
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+
+async function loadPredictionPage() {
+    const select = document.getElementById("vehicle");
+    select.innerHTML = '<option value="">Loading assigned vehicles...</option>';
+
+    // Vehicle selection must not depend on prediction-history loading.
+    // A history error should never leave the form unusable.
+    try {
+        const vehiclesResponse = await fetchWithTimeout("/api/driver/vehicles");
+        if (!vehiclesResponse.ok) {
+            throw new Error("Unable to load assigned vehicles");
+        }
+
+        const vehicles = await vehiclesResponse.json();
+        select.innerHTML = '<option value="">Select Vehicle</option>';
+        if (!Array.isArray(vehicles) || vehicles.length === 0) {
+            select.innerHTML = '<option value="">No vehicle is assigned to this driver</option>';
+            return;
+        }
+
+        vehicles.forEach(vehicle => {
+            const option = document.createElement("option");
+            option.value = vehicle.vehicle_number;
+            option.textContent = `${vehicle.vehicle_number} - ${vehicle.make} ${vehicle.model}`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Vehicle loading error:", error);
+        select.innerHTML = '<option value="">Unable to load vehicles — log in again and refresh</option>';
+    }
+
+    try {
+        const historyResponse = await fetchWithTimeout("/api/driver/predictions");
+        if (!historyResponse.ok) {
+            throw new Error("Unable to load prediction history");
+        }
+        renderPredictionHistory(await historyResponse.json());
+    } catch (error) {
+        console.error("Prediction history loading error:", error);
+        document.getElementById("predictionTable").innerHTML =
+            '<tr><td colspan="5" style="text-align:center;">Unable to load prediction history.</td></tr>';
+    }
+}
+
+function renderPredictionHistory(predictions) {
+    const table = document.getElementById("predictionTable");
+    table.innerHTML = "";
+    if (!predictions.length) {
+        table.innerHTML = '<tr><td colspan="5" style="text-align:center;">No predictions yet</td></tr>';
+        return;
+    }
+    predictions.forEach(prediction => {
+        const row = document.createElement("tr");
+        [
+            prediction.vehicle_number,
+            `${Number(prediction.battery_percentage).toFixed(1)}%`,
+            prediction.road_type,
+            `${Number(prediction.predicted_range_km).toFixed(2)} km`,
+            "Completed"
+        ].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+        table.appendChild(row);
+    });
+}
+
+async function generatePrediction() {
+    const vehicle_number = document.getElementById("vehicle").value;
+    const batteryInput = document.getElementById("battery").value;
+    const battery_percentage = Number(batteryInput);
+    const road_type = document.getElementById("roadType").value.trim();
+    if (!vehicle_number || batteryInput === "" || battery_percentage < 0 || battery_percentage > 100 || !road_type) {
+        alert("Select an assigned vehicle and enter a road type and battery percentage from 0 to 100.");
+        return;
+    }
+
+    try {
+        const response = await fetchWithTimeout("/api/driver/predictions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vehicle_number, battery_percentage, road_type })
+        });
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+            throw new Error(response.status === 401
+                ? "Your session has expired. Please log in again."
+                : "The server returned an unexpected response. Please try again.");
+        }
+        const prediction = await response.json();
+        if (!response.ok) throw new Error(prediction.error || "Prediction failed");
+
+        document.getElementById("predictionValue").textContent =
+            Number(prediction.predicted_range_km).toFixed(2) + " km";
+        document.getElementById("predictionMessage").textContent =
+            "Estimated from the latest stored vehicle reading";
+        document.getElementById("resultVehicle").textContent = prediction.vehicle_number;
+        document.getElementById("resultBattery").textContent = prediction.battery_percentage + "%";
+        document.getElementById("resultRoadType").textContent = prediction.road_type;
+        document.getElementById("resultStatus").textContent = prediction.status;
+
+        const historyResponse = await fetchWithTimeout("/api/driver/predictions");
+        if (!historyResponse.ok) throw new Error("Prediction was saved, but its history could not be refreshed.");
+        renderPredictionHistory(await historyResponse.json());
+    } catch (error) {
+        console.error("Prediction error:", error);
+        alert(error.message);
+    }
+}
+
+loadPredictionPage();
+
+</script>
+
+
+</body>
+
+</html>

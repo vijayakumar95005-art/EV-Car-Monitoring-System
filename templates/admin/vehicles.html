@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>VOLTRIX - Vehicles</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- SIDEBAR -->
+<!-- ================================================= -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+
+            <span>
+                Admin Panel
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="{{ url_for('admin_dashboard') }}">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="{{ url_for('admin_vehicles') }}"
+           class="active">
+
+            <span>🚗</span>
+            <span>Vehicles</span>
+
+        </a>
+
+
+        <a href="{{ url_for('admin_maintenance') }}">
+
+            <span>🔧</span>
+            <span>Maintenance</span>
+
+        </a>
+
+
+        <a href="{{ url_for('admin_revenue') }}">
+
+            <span>💰</span>
+            <span>Revenue</span>
+
+        </a>
+
+
+      <a href="{{ url_for('admin_electricity') }}">
+    <span>⚡</span>
+    <span>Electricity</span>
+     </a>
+
+
+        <a href="{{ url_for('admin_driver_behaviour') }}">
+
+            <span>👨‍✈️</span>
+            <span>Driver Behaviour</span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- SIDEBAR BOTTOM -->
+
+    <div class="sidebar-bottom">
+
+        <a href="{{ url_for('logout') }}">
+
+            <span>🚪</span>
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ================================================= -->
+<!-- MAIN CONTENT -->
+<!-- ================================================= -->
+
+<main class="main-content">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Vehicles
+            </h1>
+
+            <p>
+                Monitor all electric vehicles
+            </p>
+
+        </div>
+
+
+        <!-- ADMIN PROFILE -->
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>
+                    Admin
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="date-filter-panel" aria-label="Vehicle list filters">
+        <label for="vehicleDateRange">Date Range</label>
+        <select id="vehicleDateRange">
+            <option value="all">All Dates</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Dates</option>
+        </select>
+
+        <div class="custom-date-range" id="customVehicleDates" hidden>
+            <label for="vehicleStartDate">From</label>
+            <input type="date" id="vehicleStartDate">
+            <label for="vehicleEndDate">To</label>
+            <input type="date" id="vehicleEndDate">
+        </div>
+
+        <label class="company-filter-control" for="vehicleCompanyFilter">
+            <span>Company</span>
+            <select id="vehicleCompanyFilter">
+                <option value="">All Companies</option>
+            </select>
+        </label>
+        <button type="button" id="applyVehicleFilters">Apply</button>
+    </section>
+
+
+
+    <!-- ================================================= -->
+    <!-- VEHICLE SECTION -->
+    <!-- ================================================= -->
+
+    <section class="panel full-panel">
+
+
+        <!-- PANEL HEADER -->
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🚗 Vehicle List
+                </h2>
+
+                <p>
+                    Current fleet information
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- VEHICLE TABLE -->
+        <!-- ================================================= -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Vehicle
+                        </th>
+
+                        <th>
+                            Make
+                        </th>
+
+                        <th>
+                            Model
+                        </th>
+
+                        <th>
+                            Driver
+                        </th>
+
+                        <th>
+                            Battery
+                        </th>
+
+                        <th>
+                            Location
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="vehiclesTableBody">
+
+                    <tr>
+
+                        <td colspan="7"
+                            style="text-align:center;">
+
+                            Loading vehicles...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ================================================= -->
+
+<script>
+
+
+// =====================================================
+// LOAD VEHICLES
+// =====================================================
+
+function formatVehicleDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function vehicleDateQuery() {
+    const range = document.getElementById("vehicleDateRange").value;
+    const today = new Date();
+    let startDate = "";
+    let endDate = "";
+    if (range === "month") {
+        startDate = formatVehicleDate(new Date(today.getFullYear(), today.getMonth(), 1));
+        endDate = formatVehicleDate(today);
+    } else if (range === "year") {
+        startDate = `${today.getFullYear()}-01-01`;
+        endDate = formatVehicleDate(today);
+    } else if (range === "custom") {
+        startDate = document.getElementById("vehicleStartDate").value;
+        endDate = document.getElementById("vehicleEndDate").value;
+    }
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+        throw new Error("Select both a start date and an end date.");
+    }
+    if (startDate && endDate && startDate > endDate) {
+        throw new Error("The start date must be before the end date.");
+    }
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const query = params.toString();
+    return query ? `?${query}` : "";
+}
+
+function updateVehicleCompanyOptions(vehicles) {
+    const select = document.getElementById("vehicleCompanyFilter");
+    const selectedCompany = select.value;
+    const companies = [...new Set(vehicles.map(vehicle => vehicle.make))]
+        .filter(Boolean)
+        .sort((left, right) => String(left).localeCompare(String(right)));
+    select.innerHTML = '<option value="">All Companies</option>';
+    companies.forEach(company => {
+        const option = document.createElement("option");
+        option.value = company;
+        option.textContent = company;
+        select.appendChild(option);
+    });
+    select.value = companies.includes(selectedCompany) ? selectedCompany : "";
+}
+
+async function loadVehicles() {
+
+    const tableBody =
+        document.getElementById("vehiclesTableBody");
+
+
+    try {
+
+        // Show loading message
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="7"
+                    style="text-align:center;">
+
+                    Loading vehicles...
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+        // API REQUEST
+
+        const response =
+            await fetch("/api/vehicles" + vehicleDateQuery());
+
+
+        // Check response
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server returned ${response.status}`
+            );
+
+        }
+
+
+        // Convert response to JSON
+
+        const vehicles =
+            await response.json();
+        updateVehicleCompanyOptions(vehicles);
+        const selectedCompany = document.getElementById("vehicleCompanyFilter").value;
+        const filteredVehicles = vehicles.filter(vehicle =>
+            !selectedCompany || vehicle.make === selectedCompany
+        );
+
+
+        console.log(
+            "Vehicles received:",
+            vehicles
+        );
+
+
+        // Clear table
+
+        tableBody.innerHTML = "";
+
+
+        // =================================================
+        // NO VEHICLES
+        // =================================================
+
+        if (!Array.isArray(filteredVehicles) ||
+            filteredVehicles.length === 0) {
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="7"
+                        style="text-align:center;">
+
+                        No vehicles found
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        // =================================================
+        // CREATE VEHICLE ROWS
+        // =================================================
+
+        filteredVehicles.forEach(vehicle => {
+
+
+            const row =
+                document.createElement("tr");
+
+
+            // Vehicle number
+
+            const vehicleNumber =
+                vehicle.vehicle_number ?? "--";
+
+
+            // Make
+
+            const make =
+                vehicle.make ?? "--";
+
+
+            // Model
+
+            const model =
+                vehicle.model ?? "--";
+
+
+            // Driver
+
+            const driver =
+                vehicle.driver_name ?? "Not Assigned";
+
+
+            // Battery
+
+            let battery =
+                vehicle.battery_percentage;
+
+
+            if (battery === null ||
+                battery === undefined ||
+                battery === "") {
+
+                battery = "--";
+
+            }
+            else {
+
+                battery =
+                    Number(battery).toFixed(1) + "%";
+
+            }
+
+
+            // Location
+
+            const location =
+                vehicle.city ?? "--";
+
+
+            // Status
+
+            const status =
+                vehicle.status ?? "--";
+
+
+            // =================================================
+            // STATUS CLASS
+            // =================================================
+
+            let statusClass =
+                "status-normal";
+
+
+            const statusLower =
+                String(status).toLowerCase();
+
+
+            if (statusLower === "running") {
+
+                statusClass =
+                    "status-running";
+
+            }
+            else if (
+                statusLower === "charging"
+            ) {
+
+                statusClass =
+                    "status-charging";
+
+            }
+            else if (
+                statusLower === "maintenance" ||
+                statusLower === "garage"
+            ) {
+
+                statusClass =
+                    "status-warning";
+
+            }
+            else if (
+                statusLower === "parked"
+            ) {
+
+                statusClass =
+                    "status-parked";
+
+            }
+
+
+            // =================================================
+            // CREATE HTML
+            // =================================================
+
+            row.innerHTML = `
+
+                <td>
+
+                    <strong>
+                        ${vehicleNumber}
+                    </strong>
+
+                </td>
+
+
+                <td>
+                    ${make}
+                </td>
+
+
+                <td>
+                    ${model}
+                </td>
+
+
+                <td>
+                    ${driver}
+                </td>
+
+
+                <td>
+                    ${battery}
+                </td>
+
+
+                <td>
+                    📍 ${location}
+                </td>
+
+
+                <td>
+
+                    <span class="${statusClass}">
+                        ${status}
+                    </span>
+
+                </td>
+
+            `;
+
+
+            // Add row
+
+            tableBody.appendChild(row);
+
+        });
+
+
+    }
+    catch (error) {
+
+
+        console.error(
+            "Vehicle loading error:",
+            error
+        );
+
+
+        // Show error on page
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="7"
+                    style="
+                        text-align:center;
+                        color:#ff6b6b;
+                        padding:25px;
+                    ">
+
+                    Unable to load vehicle data.
+
+                    <br>
+
+                    <small>
+                        Check the Flask API:
+                        /api/vehicles
+                    </small>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+// =====================================================
+// START
+// =====================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        document.getElementById("vehicleDateRange").addEventListener("change", event => {
+            document.getElementById("customVehicleDates").hidden = event.target.value !== "custom";
+        });
+        document.getElementById("applyVehicleFilters").addEventListener("click", loadVehicles);
+        document.getElementById("vehicleCompanyFilter").addEventListener("change", loadVehicles);
+
+        loadVehicles();
+
+    }
+);
+
+</script>
+
+
+
+<!-- ================================================= -->
+<!-- TABLE SORTING -->
+<!-- ================================================= -->
+
+</body>
+
+</html>

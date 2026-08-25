@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Electricity</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ============================= -->
+<!-- SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+
+            <span>
+                Admin Panel
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+    <nav>
+
+        <!-- DASHBOARD -->
+        <a href="{{ url_for('admin_dashboard') }}">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <!-- VEHICLES -->
+        <a href="{{ url_for('admin_vehicles') }}">
+
+            <span>🚗</span>
+            <span>Vehicles</span>
+
+        </a>
+
+
+        <!-- MAINTENANCE -->
+        <a href="{{ url_for('admin_maintenance') }}">
+
+            <span>🔧</span>
+            <span>Maintenance</span>
+
+        </a>
+
+
+        <!-- REVENUE -->
+        <a href="{{ url_for('admin_revenue') }}">
+
+            <span>💰</span>
+            <span>Revenue</span>
+
+        </a>
+
+
+        <!-- ELECTRICITY -->
+        <a href="{{ url_for('admin_electricity') }}">
+
+            <span>⚡</span>
+            <span>Electricity</span>
+
+        </a>
+
+
+        <!-- DRIVER BEHAVIOUR -->
+        <a href="{{ url_for('admin_driver_behaviour') }}">
+
+            <span>👨‍✈️</span>
+            <span>Driver Behaviour</span>
+
+        </a>
+
+
+        
+
+    </nav>
+
+
+    <!-- BOTTOM -->
+    <div class="sidebar-bottom">
+
+
+        <a href="{{ url_for('logout') }}">
+
+            <span>🚪</span>
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- ============================= -->
+<!-- MAIN CONTENT -->
+<!-- ============================= -->
+
+<main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Electricity Analysis
+            </h1>
+
+            <p>
+                Monitor EV electricity consumption and efficiency
+            </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>
+                    Admin
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="date-filter-panel">
+        <label for="dateRange">Date Range</label>
+        <select id="dateRange">
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="all">All Dates</option>
+            <option value="custom">Custom Dates</option>
+        </select>
+        <input type="date" id="startDate" aria-label="Start date" hidden>
+        <input type="date" id="endDate" aria-label="End date" hidden>
+        <button type="button" id="applyDateFilter" hidden>Apply</button>
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- SUMMARY CARDS -->
+    <!-- ============================= -->
+
+    <section>
+
+        <div class="stats-grid">
+
+
+            <!-- TOTAL CONSUMPTION -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Consumption
+                    </span>
+
+                    <h3 id="totalConsumption">--</h3>
+
+                    <span class="stat-info">
+                        Fleet consumption
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- AVERAGE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Average / Vehicle
+                    </span>
+
+                   <h3 id="averageConsumption">--</h3>
+
+                    <span class="stat-info">
+                        Average consumption
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- HIGH CONSUMPTION -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Highest Consumer
+                    </span>
+
+                    <h3 id="highestConsumer">--</h3>
+
+                    <span class="stat-info">
+                        320 kWh
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- EFFICIENCY -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚗
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Fleet Efficiency
+                    </span>
+
+                    <h3 id="fleetEfficiency">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        km / kWh
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+<section class="panel full-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>
+                ⚠ Highest Electricity Consumption
+            </h2>
+
+            <p>
+                Vehicle consuming the highest amount of electricity
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="maintenance-result">
+
+        <div class="vehicle-avatar">
+            EV
+        </div>
+
+        <div>
+
+            <h3 id="highestConsumerVehicle">
+                --
+            </h3>
+
+            <p id="highestConsumerModel">
+                --
+            </p>
+
+        </div>
+
+        <div class="warning">
+            High Consumption
+        </div>
+
+    </div>
+
+
+    <div class="maintenance-details">
+
+        <div>
+
+            <span>
+                Electricity Used
+            </span>
+
+            <strong id="highestConsumerElectricity">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Distance Travelled
+            </span>
+
+            <strong id="highestConsumerDistance">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Efficiency
+            </span>
+
+            <strong id="highestConsumerEfficiency">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Status
+            </span>
+
+            <strong id="highestConsumerStatus">
+                --
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+    <!-- ============================= -->
+    <!-- VEHICLE CONSUMPTION -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    ⚡ Vehicle-wise Electricity Consumption
+                </h2>
+
+                <p>
+                    Compare electricity consumption between vehicles
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Vehicle</th>
+
+                        <th>Make</th>
+
+                        <th>Distance</th>
+
+                        <th>Electricity</th>
+
+                        <th>Efficiency</th>
+
+                        <th>Battery</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="electricityTableBody">
+
+    <tr>
+        <td colspan="7" style="text-align:center;">
+            Loading electricity data...
+        </td>
+    </tr>
+
+</tbody>
+</table>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- CONSUMPTION INFORMATION -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    📌 Consumption Analysis
+                </h2>
+
+                <p>
+                    Important observations from fleet data
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="maintenance-details">
+
+
+            <div>
+
+                <span>
+                    Highest Consumer
+                </span>
+
+                <strong
+                    id="analysisHighestConsumer">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Most Efficient
+                </span>
+
+                <strong id="analysisMostEfficient">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Highest Usage
+                </span>
+
+                <strong id="analysisHighestUsage">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Best Efficiency
+                </span>
+
+                 <strong id="analysisBestEfficiency">
+                    --
+                 </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<script>
+
+
+// ==========================================
+// LOAD ELECTRICITY TABLE
+// ==========================================
+
+async function loadElectricity() {
+
+    try {
+
+        const response =
+            await fetch(`/api/electricity${getDateQuery()}`);
+
+        if (!response.ok) {
+            throw new Error("Unable to load electricity data");
+        }
+
+        const data = await response.json();
+
+        const tableBody =
+            document.getElementById("electricityTableBody");
+
+        tableBody.innerHTML = "";
+
+
+        if (data.length === 0) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        No electricity records found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        data.forEach(record => {
+
+            const electricity =
+                Number(record.electricity || 0);
+
+            const distance =
+                Number(record.distance || 0);
+
+            const battery =
+                Number(record.battery || 0);
+
+            let efficiency = 0;
+
+            if (electricity > 0) {
+                efficiency = distance / electricity;
+            }
+
+
+            let status = "Normal";
+
+            if (efficiency < 3) {
+
+                status = "High";
+
+            } else if (efficiency >= 4) {
+
+                status = "Efficient";
+
+            }
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    <strong>
+                        ${record.vehicle_number}
+                    </strong>
+                </td>
+
+                <td>
+                    ${record.make}
+                </td>
+
+                <td>
+                    ${distance.toFixed(2)} km
+                </td>
+
+                <td>
+                    <strong>
+                        ${electricity.toFixed(2)} kWh
+                    </strong>
+                </td>
+
+                <td>
+                    ${efficiency.toFixed(2)} km/kWh
+                </td>
+
+                <td>
+                    ${battery.toFixed(1)}%
+                </td>
+
+                <td>
+                    <span class="status-normal">
+                        ${status}
+                    </span>
+                </td>
+
+            `;
+
+
+            tableBody.appendChild(row);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Electricity loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// LOAD ELECTRICITY SUMMARY
+// ==========================================
+
+async function loadElectricitySummary() {
+
+    try {
+
+        const response =
+            await fetch(`/api/electricity-summary${getDateQuery()}`);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load electricity summary"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        // TOTAL CONSUMPTION
+
+        document.getElementById(
+            "totalConsumption"
+        ).textContent =
+            Number(
+                data.total_consumption
+            ).toFixed(2) + " kWh";
+
+
+        // AVERAGE PER VEHICLE
+
+        document.getElementById(
+            "averageConsumption"
+        ).textContent =
+            Number(
+                data.average_consumption
+            ).toFixed(2) + " kWh";
+
+
+        // HIGHEST CONSUMER
+
+        document.getElementById(
+            "highestConsumer"
+        ).textContent =
+            data.highest_consumer;
+// HIGHEST CONSUMER DETAILS
+
+document.getElementById(
+    "highestConsumerVehicle"
+).textContent =
+    data.highest_consumer;
+
+
+document.getElementById(
+    "highestConsumerModel"
+).textContent =
+    data.highest_consumer_make +
+    " " +
+    data.highest_consumer_model;
+
+
+document.getElementById(
+    "highestConsumerElectricity"
+).textContent =
+    Number(
+        data.highest_consumer_electricity
+    ).toFixed(2) + " kWh";
+
+
+document.getElementById(
+    "highestConsumerDistance"
+).textContent =
+    Number(
+        data.highest_consumer_distance
+    ).toFixed(2) + " km";
+
+
+// CALCULATE EFFICIENCY
+
+let highestEfficiency = 0;
+
+if (
+    data.highest_consumer_electricity > 0
+) {
+
+    highestEfficiency =
+        data.highest_consumer_distance /
+        data.highest_consumer_electricity;
+}
+
+
+document.getElementById(
+    "highestConsumerEfficiency"
+).textContent =
+    highestEfficiency.toFixed(2) +
+    " km/kWh";
+
+
+// STATUS
+
+document.getElementById(
+    "highestConsumerStatus"
+).textContent =
+    highestEfficiency < 3
+        ? "High"
+        : "Normal";
+
+
+        // FLEET EFFICIENCY
+
+        document.getElementById(
+            "fleetEfficiency"
+        ).textContent =
+            Number(
+                data.fleet_efficiency
+            ).toFixed(2);
+
+
+    } catch (error) {
+
+        console.error(
+            "Electricity summary error:",
+            error
+        );
+
+    }
+
+}
+
+async function loadElectricityAnalysis() {
+
+    try {
+
+        const response =
+            await fetch(`/api/electricity-analysis${getDateQuery()}`);
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load electricity analysis"
+            );
+
+        }
+
+        const data =
+            await response.json();
+
+
+        // Highest Consumer
+
+        document.getElementById(
+            "analysisHighestConsumer"
+        ).textContent =
+            data.highest_consumer;
+
+
+        // Most Efficient
+
+        document.getElementById(
+            "analysisMostEfficient"
+        ).textContent =
+            data.most_efficient;
+
+
+        // Highest Usage
+
+        document.getElementById(
+            "analysisHighestUsage"
+        ).textContent =
+            Number(
+                data.highest_usage
+            ).toFixed(2) + " kWh";
+
+
+        // Best Efficiency
+
+        document.getElementById(
+            "analysisBestEfficiency"
+        ).textContent =
+            Number(
+                data.best_efficiency
+            ).toFixed(2) + " km/kWh";
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Electricity analysis error:",
+            error
+        );
+
+    }
+
+}
+
+function getDateQuery() {
+    const range = document.getElementById("dateRange").value;
+    if (range === "all") return "";
+    const today = new Date();
+    const formatDate = date => date.toISOString().slice(0, 10);
+    const start = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 0, 1))
+        : document.getElementById("startDate").value;
+    const end = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 11, 31))
+        : document.getElementById("endDate").value;
+    return start && end ? `?start_date=${start}&end_date=${end}` : "";
+}
+
+function setDefaultDates() {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    document.getElementById("startDate").value = firstDay.toISOString().slice(0, 10);
+    document.getElementById("endDate").value = today.toISOString().slice(0, 10);
+}
+
+function reloadElectricityForDateRange() {
+    loadElectricity();
+    loadElectricitySummary();
+    loadElectricityAnalysis();
+}
+
+document.getElementById("dateRange").addEventListener("change", event => {
+    const custom = event.target.value === "custom";
+    document.getElementById("startDate").hidden = !custom;
+    document.getElementById("endDate").hidden = !custom;
+    document.getElementById("applyDateFilter").hidden = !custom;
+    if (!custom) reloadElectricityForDateRange();
+});
+document.getElementById("applyDateFilter").addEventListener("click", reloadElectricityForDateRange);
+setDefaultDates();
+
+// ==========================================
+// RUN FUNCTIONS
+// ==========================================
+
+loadElectricity();
+
+loadElectricitySummary();
+
+loadElectricityAnalysis();
+
+</script>
+
+</html>

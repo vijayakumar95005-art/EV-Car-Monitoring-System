@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Maintenance</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ============================= -->
+<!-- SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+            <span>Admin Panel</span>
+        </div>
+
+    </div>
+
+
+    <nav>
+
+        <a href="{{ url_for('admin_dashboard') }}">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('admin_vehicles') }}">
+            <span>🚗</span>
+            <span>Vehicles</span>
+        </a>
+
+       <a href="{{ url_for('admin_maintenance') }}" class="active" aria-current="page">
+    <span>🔧</span>
+    <span>Maintenance</span>
+</a>
+
+        <a href="{{ url_for('admin_revenue') }}">
+            <span>💰</span>
+            <span>Revenue</span>
+        </a>
+
+        <a href="{{ url_for('admin_electricity') }}">
+            <span>⚡</span>
+            <span>Electricity</span>
+        </a>
+
+        <a href="{{ url_for('admin_driver_behaviour') }}">
+            <span>👨‍✈️</span>
+            <span>Driver Behaviour</span>
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ============================= -->
+<!-- MAIN -->
+<!-- ============================= -->
+
+<main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>Maintenance Analysis</h1>
+
+            <p>
+                Monitor EV maintenance and service requirements
+            </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>Admin</strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="date-filter-panel">
+        <label for="dateRange">Date Range</label>
+        <select id="dateRange">
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="all">All Dates</option>
+            <option value="custom">Custom Dates</option>
+        </select>
+        <input type="date" id="startDate" aria-label="Start date" hidden>
+        <input type="date" id="endDate" aria-label="End date" hidden>
+        <button type="button" id="applyDateFilter" hidden>Apply</button>
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- SUMMARY CARDS -->
+    <!-- ============================= -->
+
+    <section>
+
+        <div class="stats-grid">
+
+
+            <!-- TOTAL RECORDS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔧
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Records
+                    </span>
+
+                    <h3 id="totalRecords">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Maintenance records
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- VEHICLES SERVICED -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚗
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Vehicles Serviced
+                    </span>
+
+                    <h3 id="vehiclesServiced">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Vehicles requiring service
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TOTAL COST -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ₹
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Cost
+                    </span>
+
+                    <h3 id="totalCost">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Maintenance expense
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- HIGH MAINTENANCE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        High Maintenance
+                    </span>
+
+                    <h3 id="highMaintenanceVehicleCard">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Requires attention
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- MAX MAINTENANCE -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    ⚠ Vehicle Requiring Maximum Maintenance
+                </h2>
+
+                <p>
+                    Vehicle with the highest number of maintenance records
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="maintenance-result">
+
+
+            <div class="vehicle-avatar">
+                EV
+            </div>
+
+
+            <div>
+
+                <h3 id="highMaintenanceVehicle">
+                    --
+                </h3>
+
+                <p id="highMaintenanceModel">
+                    --
+                </p>
+
+            </div>
+
+
+            <div class="warning">
+                High Maintenance
+            </div>
+
+
+        </div>
+
+
+
+        <!-- DETAILS -->
+
+        <div class="maintenance-details">
+
+
+            <div>
+
+                <span>
+                    Maintenance Count
+                </span>
+
+                <strong id="maintenanceCount">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Total Cost
+                </span>
+
+                <strong id="vehicleCost">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Last Service
+                </span>
+
+                <strong id="lastService">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Current Status
+                </span>
+
+                <strong id="vehicleStatus">
+                    --
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- MAINTENANCE HISTORY -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🔧 Maintenance History
+                </h2>
+
+                <p>
+                    Recent maintenance records
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="table-container">
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Vehicle</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Service</th>
+                        <th>Description</th>
+                        <th>Cost</th>
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="maintenanceTableBody">
+
+                    <tr>
+
+                        <td colspan="7"
+                            style="text-align:center;">
+
+                            Loading maintenance records...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ============================= -->
+<!-- JAVASCRIPT -->
+<!-- ============================= -->
+
+<script>
+
+
+// ==========================================
+// LOAD MAINTENANCE HISTORY
+// ==========================================
+
+async function loadMaintenance() {
+
+    try {
+
+        const response =
+            await fetch(`/api/maintenance${getDateQuery()}`);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load maintenance data"
+            );
+
+        }
+
+
+        const records =
+            await response.json();
+
+
+        const tableBody =
+            document.getElementById(
+                "maintenanceTableBody"
+            );
+
+
+        tableBody.innerHTML = "";
+
+
+        if (records.length === 0) {
+
+            tableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="7"
+                        style="text-align:center;">
+
+                        No maintenance records found
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        records.forEach(record => {
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    <strong>
+                        ${record.vehicle_number}
+                    </strong>
+                </td>
+
+                <td>
+                    ${record.make}
+                </td>
+
+                <td>
+                    ${record.model}
+                </td>
+
+                <td>
+                    ${record.maintenance_type}
+                </td>
+
+                <td>
+                    ${record.description ?? "--"}
+                </td>
+
+                <td>
+                    ₹${Number(record.cost)
+                        .toLocaleString("en-IN")}
+                </td>
+
+                <td>
+                    ${record.maintenance_date}
+                </td>
+
+            `;
+
+
+            tableBody.appendChild(row);
+
+
+        });
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Maintenance loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// LOAD MAINTENANCE SUMMARY
+// ==========================================
+
+async function loadMaintenanceSummary() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/maintenance-summary${getDateQuery()}`
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load maintenance summary"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        // Total records
+
+        document.getElementById(
+            "totalRecords"
+        ).textContent =
+            data.total_records;
+
+
+
+        // Vehicles serviced
+
+        document.getElementById(
+            "vehiclesServiced"
+        ).textContent =
+            data.vehicles_serviced;
+
+
+
+        // Total cost
+
+        document.getElementById(
+            "totalCost"
+        ).textContent =
+            "₹" +
+            Number(data.total_cost)
+                .toLocaleString("en-IN");
+
+
+
+        // High maintenance vehicle - card
+
+        document.getElementById(
+            "highMaintenanceVehicleCard"
+        ).textContent =
+            data.high_maintenance_vehicle;
+
+
+
+        // High maintenance vehicle
+
+        document.getElementById(
+            "highMaintenanceVehicle"
+        ).textContent =
+            data.high_maintenance_vehicle;
+
+
+
+        // Model
+
+        document.getElementById(
+            "highMaintenanceModel"
+        ).textContent =
+            data.high_maintenance_model;
+
+
+
+        // Maintenance count
+
+        document.getElementById(
+            "maintenanceCount"
+        ).textContent =
+            data.maintenance_count;
+
+
+
+        // Vehicle cost
+
+        document.getElementById(
+            "vehicleCost"
+        ).textContent =
+            "₹" +
+            Number(data.vehicle_cost)
+                .toLocaleString("en-IN");
+
+
+
+        // Last service
+
+        document.getElementById(
+            "lastService"
+        ).textContent =
+            data.last_service;
+
+
+
+        // Vehicle status
+
+        document.getElementById(
+            "vehicleStatus"
+        ).textContent =
+            data.vehicle_status;
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Maintenance summary error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+// ==========================================
+// RUN FUNCTIONS
+// ==========================================
+
+setDefaultDates();
+loadMaintenance();
+loadMaintenanceSummary();
+
+function getDateQuery() {
+    const range = document.getElementById("dateRange").value;
+    if (range === "all") return "";
+    const today = new Date();
+    const formatDate = date => date.toISOString().slice(0, 10);
+    const start = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 0, 1))
+        : document.getElementById("startDate").value;
+    const end = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 11, 31))
+        : document.getElementById("endDate").value;
+    return start && end ? `?start_date=${start}&end_date=${end}` : "";
+}
+
+function setDefaultDates() {
+    const today = new Date();
+    document.getElementById("startDate").value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+    document.getElementById("endDate").value = today.toISOString().slice(0, 10);
+}
+
+function reloadMaintenanceForDateRange() {
+    loadMaintenance();
+    loadMaintenanceSummary();
+}
+
+document.getElementById("dateRange").addEventListener("change", event => {
+    const custom = event.target.value === "custom";
+    document.getElementById("startDate").hidden = !custom;
+    document.getElementById("endDate").hidden = !custom;
+    document.getElementById("applyDateFilter").hidden = !custom;
+    if (!custom) reloadMaintenanceForDateRange();
+});
+document.getElementById("applyDateFilter").addEventListener("click", reloadMaintenanceForDateRange);
+
+
+</script>
+
+
+</body>
+
+</html>

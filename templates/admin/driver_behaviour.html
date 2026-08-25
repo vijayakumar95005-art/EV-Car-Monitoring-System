@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Driver Behaviour</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ============================= -->
+<!-- SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+
+            <span>
+                Admin Panel
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+    <nav>
+
+        <!-- DASHBOARD -->
+        <a href="{{ url_for('admin_dashboard') }}">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <!-- VEHICLES -->
+        <a href="{{ url_for('admin_vehicles') }}">
+
+            <span>🚗</span>
+            <span>Vehicles</span>
+
+        </a>
+
+
+        <!-- MAINTENANCE -->
+        <a href="{{ url_for('admin_maintenance') }}">
+
+            <span>🔧</span>
+            <span>Maintenance</span>
+
+        </a>
+
+
+        <!-- REVENUE -->
+        <a href="{{ url_for('admin_revenue') }}">
+
+            <span>💰</span>
+            <span>Revenue</span>
+
+        </a>
+
+
+        <!-- ELECTRICITY -->
+        <a href="{{ url_for('admin_electricity') }}">
+
+            <span>⚡</span>
+            <span>Electricity</span>
+
+        </a>
+
+
+        <!-- DRIVER BEHAVIOUR -->
+        <a href="{{ url_for('admin_driver_behaviour') }}" class="active" aria-current="page">
+    <span>👨‍✈️</span>
+    <span>Driver Behaviour</span>
+</a>
+
+
+        
+    </nav>
+
+
+    <!-- BOTTOM -->
+    <div class="sidebar-bottom">
+
+
+        <a href="{{ url_for('logout') }}">
+
+            <span>🚪</span>
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- ============================= -->
+<!-- MAIN CONTENT -->
+<!-- ============================= -->
+
+<main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Driver Behaviour
+            </h1>
+
+            <p>
+                Monitor driver speed and driving behaviour
+            </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>
+                    Admin
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="date-filter-panel">
+        <label for="dateRange">Date Range</label>
+        <select id="dateRange">
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="all">All Dates</option>
+            <option value="custom">Custom Dates</option>
+        </select>
+        <input type="date" id="startDate" aria-label="Start date" hidden>
+        <input type="date" id="endDate" aria-label="End date" hidden>
+        <button type="button" id="applyDateFilter" hidden>Apply</button>
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- SUMMARY -->
+    <!-- ============================= -->
+
+    <section>
+
+        <div class="stats-grid">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👨‍✈️
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Drivers
+                    </span>
+
+                  <h3 id="totalDrivers">--</h3>
+
+                    <span class="stat-info">
+                        Active drivers
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚨
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Overspeed Events
+                    </span>
+
+                   <h3 id="overspeedEvents">--</h3>
+
+                    <span class="stat-info">
+                        This month
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Rash Driving
+                    </span>
+
+                   <h3 id="rashEvents">--</h3>
+
+                    <span class="stat-info">
+                        Detected events
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🛡️
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Average Safety Score
+                    </span>
+
+                   <h3 id="averageSafetyScore">--</h3>
+
+                    <span class="stat-info">
+                        Fleet safety
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- DRIVER PERFORMANCE -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    👨‍✈️ Driver Performance
+                </h2>
+
+                <p>
+                    Driving behaviour of registered drivers
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Driver</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Avg Speed</th>
+
+                        <th>Speed Limit</th>
+
+                        <th>Overspeed</th>
+
+                        <th>Rash Driving</th>
+
+                        <th>Safety Score</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+               <tbody id="driverBehaviourTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- HIGH RISK DRIVER -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🚨 High-Risk Driver
+                </h2>
+
+                <p>
+                    Driver requiring attention based on behaviour
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="maintenance-result" id="highRiskDriver">
+
+
+            <div class="vehicle-avatar" id="highRiskAvatar">
+                D3
+            </div>
+
+
+            <div>
+
+                <h3 id="highRiskDriverName">
+                    Driver 003
+                </h3>
+
+                <p id="highRiskVehicle">
+                    Assigned Vehicle: --
+                </p>
+
+            </div>
+
+
+            <div class="warning" id="highRiskStatus">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="maintenance-details">
+
+
+            <div>
+
+                <span>
+                    Average Speed
+                </span>
+
+                <strong id="highRiskAverageSpeed">
+                    71 km/h
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Speed Limit
+                </span>
+
+                <strong id="highRiskSpeedLimit">
+                    60 km/h
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Overspeed Events
+                </span>
+
+                <strong id="highRiskOverspeedEvents">
+                    12
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Rash Driving
+                </span>
+
+                <strong id="highRiskRashEvents">
+                    4 Events
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- DRIVING EVENTS -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🚨 Driving Events
+                </h2>
+
+                <p>
+                    Recorded speed and rash-driving events
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Driver</th>
+
+                        <th>Vehicle</th>
+
+                        <th>Event</th>
+
+                        <th>Speed</th>
+
+                        <th>Speed Limit</th>
+
+                        <th>Location</th>
+
+                        <th>Reading</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="drivingEventsTableBody">
+
+
+                    <tr>
+
+                        <td>
+                            Driver 003
+                        </td>
+
+                        <td>
+                            EV103
+                        </td>
+
+                        <td>
+                            Overspeed
+                        </td>
+
+                        <td>
+                            82 km/h
+                        </td>
+
+                        <td>
+                            60 km/h
+                        </td>
+
+                        <td>
+                            Madurai
+                        </td>
+
+                        <td>
+                            18 Aug 2026 10:42 AM
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            Driver 003
+                        </td>
+
+                        <td>
+                            EV103
+                        </td>
+
+                        <td>
+                            Rash Driving
+                        </td>
+
+                        <td>
+                            76 km/h
+                        </td>
+
+                        <td>
+                            60 km/h
+                        </td>
+
+                        <td>
+                            Madurai
+                        </td>
+
+                        <td>
+                            18 Aug 2026 09:18 AM
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            Driver 002
+                        </td>
+
+                        <td>
+                            EV102
+                        </td>
+
+                        <td>
+                            Overspeed
+                        </td>
+
+                        <td>
+                            68 km/h
+                        </td>
+
+                        <td>
+                            60 km/h
+                        </td>
+
+                        <td>
+                            Chennai
+                        </td>
+
+                        <td>
+                            17 Aug 2026 06:32 PM
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            Driver 001
+                        </td>
+
+                        <td>
+                            EV101
+                        </td>
+
+                        <td>
+                            Overspeed
+                        </td>
+
+                        <td>
+                            65 km/h
+                        </td>
+
+                        <td>
+                            60 km/h
+                        </td>
+
+                        <td>
+                            Madurai
+                        </td>
+
+                        <td>
+                            16 Aug 2026 04:20 PM
+                        </td>
+
+                    </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+<script>
+
+async function loadDriverBehaviour() {
+
+    try {
+
+        const response =
+            await fetch(`/api/driver-behaviour${getDateQuery()}`);
+
+        if (!response.ok) {
+            throw new Error("Unable to load driver behaviour data");
+        }
+
+        const data = await response.json();
+
+        const tableBody =
+            document.getElementById("driverBehaviourTableBody");
+
+        tableBody.innerHTML = "";
+
+        if (data.length === 0) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align:center;">
+                        No driver behaviour records found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        data.forEach(record => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td><strong>${record.driver_name}</strong></td>
+                <td>${record.vehicle_number}</td>
+                <td>${Number(record.average_speed || 0).toFixed(2)} km/h</td>
+                <td>${record.speed_limit} km/h</td>
+                <td>${record.overspeed_events}</td>
+                <td>${record.rash_events}</td>
+                <td>${Number(record.safety_score || 0).toFixed(0)}%</td>
+                <td>${record.status}</td>
+            `;
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            "Driver behaviour loading error:",
+            error
+        );
+
+    }
+
+}
+
+</script>
+<script>
+
+async function loadDriverBehaviourSummary() {
+
+    try {
+
+        const response =
+            await fetch(`/api/driver-behaviour-metrics${getDateQuery()}`);
+
+        if (!response.ok) {
+            throw new Error("Unable to load behaviour summary");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("totalDrivers").textContent =
+            data.total_drivers;
+
+        document.getElementById("overspeedEvents").textContent =
+            data.overspeed_events;
+
+        document.getElementById("rashEvents").textContent =
+            data.rash_events;
+
+        document.getElementById("averageSafetyScore").textContent =
+            Number(data.average_safety_score).toFixed(0) + "%";
+
+    }
+    catch (error) {
+
+        console.error(
+            "Driver behaviour summary error:",
+            error
+        );
+
+    }
+
+}
+
+</script>
+
+<script>
+
+async function loadHighRiskDriver() {
+
+    const response = await fetch(`/api/high-risk-driver${getDateQuery()}`);
+    const driver = await response.json();
+
+    document.getElementById("highRiskDriverName").textContent =
+        driver.driver_name;
+    document.getElementById("highRiskVehicle").textContent =
+        "Assigned Vehicle: " + driver.vehicle_number;
+    document.getElementById("highRiskAvatar").textContent =
+        driver.vehicle_number === "--" ? "--" : driver.vehicle_number.slice(-2);
+    document.getElementById("highRiskStatus").textContent =
+        driver.vehicle_number === "--" ? "No Data" : "High Risk";
+    document.getElementById("highRiskAverageSpeed").textContent =
+        Number(driver.average_speed || 0).toFixed(2) + " km/h";
+    document.getElementById("highRiskSpeedLimit").textContent =
+        Number(driver.speed_limit || 0).toFixed(2) + " km/h";
+    document.getElementById("highRiskOverspeedEvents").textContent =
+        driver.overspeed_events;
+    document.getElementById("highRiskRashEvents").textContent =
+        driver.rash_events + " Events";
+}
+
+async function loadDrivingEvents() {
+
+    const response = await fetch(`/api/driving-events${getDateQuery()}`);
+    const events = await response.json();
+    const tableBody = document.getElementById("drivingEventsTableBody");
+    tableBody.innerHTML = "";
+
+    if (events.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan=\"7\">No driving events found</td></tr>";
+        return;
+    }
+
+    events.forEach(event => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${event.driver_name}</td>
+            <td>${event.vehicle_number}</td>
+            <td>${event.event}</td>
+            <td>${Number(event.speed || 0).toFixed(2)} km/h</td>
+            <td>${event.speed_limit} km/h</td>
+            <td>${event.city || "--"}</td>
+            <td>${event.recorded_at || "--"}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+loadHighRiskDriver().catch(error => console.error("High-risk driver error:", error));
+loadDrivingEvents().catch(error => console.error("Driving events error:", error));
+
+function getDateQuery() {
+    const range = document.getElementById("dateRange").value;
+    if (range === "all") return "";
+    const today = new Date();
+    const formatDate = date => date.toISOString().slice(0, 10);
+    const start = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 0, 1))
+        : document.getElementById("startDate").value;
+    const end = range === "year"
+        ? formatDate(new Date(today.getFullYear(), 11, 31))
+        : document.getElementById("endDate").value;
+    return start && end ? `?start_date=${start}&end_date=${end}` : "";
+}
+
+function setDefaultDates() {
+    const today = new Date();
+    document.getElementById("startDate").value = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+    document.getElementById("endDate").value = today.toISOString().slice(0, 10);
+}
+
+function reloadBehaviourForDateRange() {
+    loadDriverBehaviour();
+    loadDriverBehaviourSummary();
+    loadHighRiskDriver();
+    loadDrivingEvents();
+}
+
+document.getElementById("dateRange").addEventListener("change", event => {
+    const custom = event.target.value === "custom";
+    document.getElementById("startDate").hidden = !custom;
+    document.getElementById("endDate").hidden = !custom;
+    document.getElementById("applyDateFilter").hidden = !custom;
+    if (!custom) reloadBehaviourForDateRange();
+});
+document.getElementById("applyDateFilter").addEventListener("click", reloadBehaviourForDateRange);
+
+// Run only after every loader and date helper has been defined. Previously,
+// the page called setDefaultDates/getDateQuery before this script loaded,
+// which prevented the default "This Month" data from loading.
+setDefaultDates();
+reloadBehaviourForDateRange();
+
+</script>
+
+</body>
+
+</html>

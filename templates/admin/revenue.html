@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Revenue</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ============================= -->
+<!-- SIDEBAR -->
+<!-- ============================= -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+    <div class="brand">
+
+        <div class="brand-icon">
+            ⚡
+        </div>
+
+        <div>
+            <h2>VOLTRIX</h2>
+
+            <span>
+                Admin Panel
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+    <nav>
+
+        <!-- DASHBOARD -->
+        <a href="{{ url_for('admin_dashboard') }}">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <!-- VEHICLES -->
+        <a href="{{ url_for('admin_vehicles') }}">
+
+            <span>🚗</span>
+            <span>Vehicles</span>
+
+        </a>
+
+
+        <!-- MAINTENANCE -->
+        <a href="{{ url_for('admin_maintenance') }}">
+
+            <span>🔧</span>
+            <span>Maintenance</span>
+
+        </a>
+
+
+        <!-- REVENUE -->
+<a href="{{ url_for('admin_revenue') }}" class="active" aria-current="page">
+    <span>💰</span>
+    <span>Revenue</span>
+</a>
+
+
+        <!-- ELECTRICITY -->
+        <a href="{{ url_for('admin_electricity') }}">
+
+            <span>⚡</span>
+            <span>Electricity</span>
+
+        </a>
+
+
+        <!-- DRIVER BEHAVIOUR -->
+        <a href="{{ url_for('admin_driver_behaviour') }}">
+
+            <span>👨‍✈️</span>
+            <span>Driver Behaviour</span>
+
+        </a>
+
+
+       
+
+    </nav>
+
+
+    <!-- BOTTOM -->
+    <div class="sidebar-bottom">
+
+
+        <a href="{{ url_for('logout') }}">
+
+            <span>🚪</span>
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</aside>
+
+<!-- ============================= -->
+<!-- MAIN -->
+<!-- ============================= -->
+
+<main class="main-content">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div>
+
+            <h1>
+                Revenue Analysis
+            </h1>
+
+            <p>
+                Analyse EV fleet revenue performance
+            </p>
+
+        </div>
+
+
+        <div class="admin-profile">
+
+            <div class="profile-icon">
+                A
+            </div>
+
+            <div>
+
+                <strong>
+                    Admin
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <section class="date-filter-panel" aria-label="Revenue date range">
+        <label for="revenueDateRange">Date Range</label>
+        <select id="revenueDateRange">
+            <option value="all">All Dates</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Dates</option>
+        </select>
+
+        <div class="custom-date-range" id="customRevenueDates" hidden>
+            <label for="revenueStartDate">From</label>
+            <input type="date" id="revenueStartDate">
+
+            <label for="revenueEndDate">To</label>
+            <input type="date" id="revenueEndDate">
+        </div>
+
+        <button type="button" id="applyRevenueDateFilter">Apply</button>
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- SUMMARY -->
+    <!-- ============================= -->
+
+    <section>
+
+        <div class="stats-grid">
+
+
+            <!-- TOTAL REVENUE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ₹
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Revenue
+                    </span>
+
+                    <h3 id="totalRevenue">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Fleet revenue
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- MONTHLY -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📈
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        This Month
+                    </span>
+
+                    <h3 id="monthlyRevenue">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        August 2026
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TOP MAKE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚗
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Top Make
+                    </span>
+
+                    <h3 id="topMake">
+                         --
+                        </h3>
+
+                    <span class="stat-info">
+                        Highest revenue
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TOTAL VEHICLES -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Revenue Vehicles
+                    </span>
+
+                    <h3 id="revenueVehicles">
+                        --
+                    </h3>
+
+                    <span class="stat-info">
+                        Active vehicles
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- TOP MAKE -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    🏆 Highest Revenue Generating Make
+                </h2>
+
+                <p>
+                    Vehicle manufacturer generating maximum revenue
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="revenue-result">
+
+
+            <div class="revenue-icon">
+                ₹
+            </div>
+
+
+            <div>
+
+                <span>
+                    Top Performing Make
+                </span>
+
+               <h3 id="topMakeResult">
+    --
+</h3>
+
+<p id="topMakeRevenue">
+    --
+</p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- REVENUE BY MAKE -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header revenue-table-header">
+
+            <div>
+
+                <h2>
+                    💰 Revenue by Vehicle Make
+                </h2>
+
+                <p>
+                    Compare revenue generated by each manufacturer
+                </p>
+
+            </div>
+
+            <label class="company-filter-control" for="revenueCompanyFilter">
+                <span>Company</span>
+                <select id="revenueCompanyFilter">
+                    <option value="">All Companies</option>
+                </select>
+            </label>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Rank</th>
+
+                        <th>Make</th>
+
+                        <th>Vehicles</th>
+
+                        <th>Total Trips</th>
+
+                        <th>Revenue</th>
+
+                        <th>Average / Vehicle</th>
+
+                        <th>Performance</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="revenueMakeTableBody">
+
+    <tr>
+
+        <td colspan="7" style="text-align:center;">
+            Loading revenue data...
+        </td>
+
+    </tr>
+
+</tbody>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#1</strong>
+                        </td>
+
+                        <td>
+                            MG
+                        </td>
+
+                        <td>
+                            10
+                        </td>
+
+                        <td>
+                            1,250
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹5,20,000
+                            </strong>
+                        </td>
+
+                        <td>
+                            ₹52,000
+                        </td>
+
+                        <td>
+
+                            <span class="status-normal">
+                                Highest
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#2</strong>
+                        </td>
+
+                        <td>
+                            Tata
+                        </td>
+
+                        <td>
+                            15
+                        </td>
+
+                        <td>
+                            1,480
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹4,80,000
+                            </strong>
+                        </td>
+
+                        <td>
+                            ₹32,000
+                        </td>
+
+                        <td>
+
+                            <span class="status-normal">
+                                Good
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#3</strong>
+                        </td>
+
+                        <td>
+                            Hyundai
+                        </td>
+
+                        <td>
+                            8
+                        </td>
+
+                        <td>
+                            920
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹3,90,000
+                            </strong>
+                        </td>
+
+                        <td>
+                            ₹48,750
+                        </td>
+
+                        <td>
+
+                            <span class="status-normal">
+                                Good
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#4</strong>
+                        </td>
+
+                        <td>
+                            Mahindra
+                        </td>
+
+                        <td>
+                            6
+                        </td>
+
+                        <td>
+                            710
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹2,80,000
+                            </strong>
+                        </td>
+
+                        <td>
+                            ₹46,667
+                        </td>
+
+                        <td>
+
+                            <span class="status-normal">
+                                Normal
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#5</strong>
+                        </td>
+
+                        <td>
+                            BYD
+                        </td>
+
+                        <td>
+                            3
+                        </td>
+
+                        <td>
+                            350
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹1,70,000
+                            </strong>
+                        </td>
+
+                        <td>
+                            ₹56,667
+                        </td>
+
+                        <td>
+
+                            <span class="status-normal">
+                                Normal
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ============================= -->
+    <!-- VEHICLE REVENUE -->
+    <!-- ============================= -->
+
+    <section class="panel full-panel">
+
+        <div class="panel-header revenue-table-header">
+
+            <div>
+
+                <h2>
+                    🚗 Vehicle-wise Revenue
+                </h2>
+
+                <p>
+                    Highest revenue generating vehicles
+                </p>
+
+            </div>
+
+            <label class="company-filter-control" for="vehicleRevenueCompanyFilter">
+                <span>Company</span>
+                <select id="vehicleRevenueCompanyFilter">
+                    <option value="">All Companies</option>
+                </select>
+            </label>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Vehicle</th>
+
+                        <th>Make</th>
+
+                        <th>Driver</th>
+
+                        <th>Trips</th>
+
+                        <th>Distance</th>
+
+                        <th>Revenue</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="vehicleRevenueTableBody">
+
+    <tr>
+
+        <td colspan="6" style="text-align:center;">
+            Loading vehicle revenue...
+        </td>
+
+    </tr>
+
+</tbody>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                EV102
+                            </strong>
+                        </td>
+
+                        <td>
+                            MG
+                        </td>
+
+                        <td>
+                            Driver 002
+                        </td>
+
+                        <td>
+                            180
+                        </td>
+
+                        <td>
+                            4,250 km
+                        </td>
+
+                        <td>
+                            ₹72,000
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                EV101
+                            </strong>
+                        </td>
+
+                        <td>
+                            Tata
+                        </td>
+
+                        <td>
+                            Driver 001
+                        </td>
+
+                        <td>
+                            165
+                        </td>
+
+                        <td>
+                            3,980 km
+                        </td>
+
+                        <td>
+                            ₹65,500
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                EV105
+                            </strong>
+                        </td>
+
+                        <td>
+                            Mahindra
+                        </td>
+
+                        <td>
+                            Driver 005
+                        </td>
+
+                        <td>
+                            142
+                        </td>
+
+                        <td>
+                            3,600 km
+                        </td>
+
+                        <td>
+                            ₹59,000
+                        </td>
+
+                    </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+</main>
+<script>
+
+let revenueByMakeRecords = [];
+
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function selectedRevenueDates() {
+    const range = document.getElementById("revenueDateRange").value;
+    const today = new Date();
+    if (range === "month") {
+        return { start: formatLocalDate(new Date(today.getFullYear(), today.getMonth(), 1)), end: formatLocalDate(today) };
+    }
+    if (range === "year") {
+        return { start: `${today.getFullYear()}-01-01`, end: formatLocalDate(today) };
+    }
+    if (range === "custom") {
+        return {
+            start: document.getElementById("revenueStartDate").value,
+            end: document.getElementById("revenueEndDate").value
+        };
+    }
+    return { start: "", end: "" };
+}
+
+function revenueQueryString() {
+    const { start: startDate, end: endDate } = selectedRevenueDates();
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const query = params.toString();
+    return query ? `?${query}` : "";
+}
+
+async function loadRevenue() {
+
+    try {
+
+        const response = await fetch("/api/revenue" + revenueQueryString());
+
+        if (!response.ok) {
+            throw new Error("Unable to load revenue data");
+        }
+
+        const revenue = await response.json();
+        updateVehicleRevenueCompanyOptions(revenue);
+        const selectedCompany = document.getElementById("vehicleRevenueCompanyFilter").value;
+        const filteredRevenue = revenue.filter(record =>
+            !selectedCompany || record.make === selectedCompany
+        );
+
+        const vehicleTable = document.getElementById("vehicleRevenueTableBody");
+        const vehicleTableElement = vehicleTable.closest("table");
+        vehicleTableElement.querySelectorAll("tbody").forEach(body => body.remove());
+        const vehicleBody = document.createElement("tbody");
+        vehicleBody.id = "vehicleRevenueTableBody";
+        vehicleTableElement.appendChild(vehicleBody);
+
+
+        if (filteredRevenue.length === 0) {
+
+            vehicleBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;">
+                        No revenue records found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        filteredRevenue.forEach(record => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+
+                <td>
+                    <strong>
+                        ${record.vehicle_number}
+                    </strong>
+                </td>
+
+                <td>
+                    ${record.make}
+                </td>
+
+                <td>${record.driver_name}</td>
+                <td>${record.trips}</td>
+                <td>${Number(record.distance || 0).toFixed(2)} km</td>
+
+                <td>
+                    ₹${Number(record.amount).toLocaleString("en-IN")}
+                </td>
+
+            `;
+
+            vehicleBody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Revenue loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+async function loadRevenueSummary() {
+
+    try {
+
+        const response =
+            await fetch("/api/revenue-summary" + revenueQueryString());
+
+        if (!response.ok) {
+            throw new Error("Unable to load revenue summary");
+        }
+
+        const data = await response.json();
+
+
+        document.getElementById("totalRevenue").textContent =
+            "₹" +
+            Number(data.total_revenue)
+                .toLocaleString("en-IN");
+
+        document.getElementById("monthlyRevenue").textContent =
+            "₹" + Number(data.monthly_revenue || 0).toLocaleString("en-IN");
+
+
+        document.getElementById("topMake").textContent =
+            data.highest_make;
+
+
+        document.getElementById("revenueVehicles").textContent =
+            data.revenue_vehicles;
+
+
+        document.getElementById("topMakeResult").textContent =
+            data.highest_make;
+
+
+        document.getElementById("topMakeRevenue").textContent =
+            "₹" +
+            Number(data.highest_make_revenue)
+                .toLocaleString("en-IN") +
+            " revenue generated";
+
+
+    } catch (error) {
+
+        console.error(
+            "Revenue summary error:",
+            error
+        );
+
+    }
+
+}
+
+
+async function loadRevenueByMake() {
+    try {
+        const response = await fetch("/api/revenue-by-make" + revenueQueryString());
+        if (!response.ok) throw new Error("Unable to load revenue by make");
+        revenueByMakeRecords = await response.json();
+        updateRevenueCompanyOptions();
+        renderRevenueByMake();
+    } catch (error) {
+        console.error("Revenue-by-make loading error:", error);
+    }
+}
+
+function updateVehicleRevenueCompanyOptions(records) {
+    const select = document.getElementById("vehicleRevenueCompanyFilter");
+    const selectedCompany = select.value;
+    const companies = [...new Set(records.map(record => record.make))]
+        .filter(Boolean)
+        .sort((left, right) => String(left).localeCompare(String(right)));
+    select.innerHTML = '<option value="">All Companies</option>';
+    companies.forEach(company => {
+        const option = document.createElement("option");
+        option.value = company;
+        option.textContent = company;
+        select.appendChild(option);
+    });
+    select.value = companies.includes(selectedCompany) ? selectedCompany : "";
+}
+
+function updateRevenueCompanyOptions() {
+    const select = document.getElementById("revenueCompanyFilter");
+    const selectedCompany = select.value;
+    const companies = [...new Set(revenueByMakeRecords.map(record => record.make))]
+        .filter(Boolean)
+        .sort((left, right) => String(left).localeCompare(String(right)));
+
+    select.innerHTML = '<option value="">All Companies</option>';
+    companies.forEach(company => {
+        const option = document.createElement("option");
+        option.value = company;
+        option.textContent = company;
+        select.appendChild(option);
+    });
+    select.value = companies.includes(selectedCompany) ? selectedCompany : "";
+}
+
+function renderRevenueByMake() {
+    const existing = document.getElementById("revenueMakeTableBody");
+    const table = existing.closest("table");
+    table.querySelectorAll("tbody").forEach(body => body.remove());
+    const body = document.createElement("tbody");
+    body.id = "revenueMakeTableBody";
+    table.appendChild(body);
+
+    const selectedCompany = document.getElementById("revenueCompanyFilter").value;
+    const records = revenueByMakeRecords.filter(record =>
+        !selectedCompany || record.make === selectedCompany
+    );
+    if (!records.length) {
+        body.innerHTML = '<tr><td colspan="7" style="text-align:center;">No revenue records found</td></tr>';
+        return;
+    }
+    const highestRevenue = Math.max(...records.map(record => Number(record.revenue) || 0));
+    records.forEach((record, index) => {
+            const row = document.createElement("tr");
+            const performance = Number(record.revenue) === highestRevenue ? "Highest" : "Good";
+            row.innerHTML = `<td><strong>#${index + 1}</strong></td>
+                <td>${record.make}</td><td>${record.vehicles}</td><td>${record.trips}</td>
+                <td><strong>₹${Number(record.revenue).toLocaleString("en-IN")}</strong></td>
+                <td>₹${Number(record.average_per_vehicle).toLocaleString("en-IN")}</td>
+                <td><span class="status-normal">${performance}</span></td>`;
+            body.appendChild(row);
+    });
+}
+
+function reloadRevenueData() {
+    const { start: startDate, end: endDate } = selectedRevenueDates();
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+        alert("Select both a start date and an end date.");
+        return;
+    }
+    if (startDate && endDate && startDate > endDate) {
+        alert("The start date must be before the end date.");
+        return;
+    }
+    loadRevenue();
+    loadRevenueSummary();
+    loadRevenueByMake();
+}
+
+document.getElementById("applyRevenueDateFilter").addEventListener("click", reloadRevenueData);
+document.getElementById("revenueDateRange").addEventListener("change", event => {
+    document.getElementById("customRevenueDates").hidden = event.target.value !== "custom";
+});
+document.getElementById("revenueCompanyFilter").addEventListener("change", () => {
+    renderRevenueByMake();
+});
+document.getElementById("vehicleRevenueCompanyFilter").addEventListener("change", loadRevenue);
+
+loadRevenue();
+
+loadRevenueSummary();
+
+loadRevenueByMake();
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EV Monitoring - Register</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <div class="logo">
+                ⚡
+            </div>
+
+            <h1>EV Monitoring</h1>
+
+            <p class="subtitle">
+                Create your account
+            </p>
+
+            <form id="registerForm" method="POST" action="{{ url_for('register') }}">
+
+                <!-- Name -->
+                <div class="input-group">
+                    <label for="name">Name</label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your name"
+                        required
+                    >
+                </div>
+
+
+                <!-- Gmail -->
+                <div class="input-group">
+                    <label for="email">Gmail</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your Gmail"
+                        required
+                    >
+                </div>
+
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label for="password">Password</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <label for="confirm_password">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Confirm your password"
+                        required
+                    >
+                </div>
+
+
+                <!-- Role -->
+                <div class="input-group">
+
+                    <label>Register As</label>
+
+                    <div class="role-container">
+
+                        <label class="role-option">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="driver"
+                                required
+                            >
+                            <span>🚗 Driver</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Register Button -->
+                <button
+                    type="submit"
+                    class="auth-button"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <!-- Login Link -->
+
+            <p class="switch-page">
+
+                Already have an account?
+
+                <a href="{{ url_for('login') }}">
+                    Login
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

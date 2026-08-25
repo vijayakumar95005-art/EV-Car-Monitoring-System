@@ -1,0 +1,6 @@
+Flask
+joblib
+mysql-connector-python
+pandas
+python-dotenv
+Werkzeug

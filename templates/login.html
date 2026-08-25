@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <title>VOLTRIX - Login</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="login-page">
+
+    <div id="login-scene" class="login-scene" aria-hidden="true">
+        <svg class="ev-scene" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="roadGlow" x1="0" x2="1">
+                    <stop offset="0" stop-color="#087ea4" stop-opacity="0" />
+                    <stop offset="0.5" stop-color="#48d9ff" stop-opacity="0.9" />
+                    <stop offset="1" stop-color="#087ea4" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="vehicleBody" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0" stop-color="#123b55" />
+                    <stop offset="0.55" stop-color="#071a29" />
+                    <stop offset="1" stop-color="#020a12" />
+                </linearGradient>
+                <linearGradient id="vehicleGlass" x1="0" x2="1">
+                    <stop offset="0" stop-color="#1a6b8c" />
+                    <stop offset="0.5" stop-color="#092d45" />
+                    <stop offset="1" stop-color="#124e6b" />
+                </linearGradient>
+                <filter id="blueBlur">
+                    <feGaussianBlur stdDeviation="8" />
+                </filter>
+            </defs>
+
+            <g class="energy-lines">
+                <path d="M-40 530 H180 V455 H310 V515 H480 C600 515 650 410 790 410 H940 V500 H1240" />
+                <path d="M-60 600 H140 V665 H330 V580 H520 C690 580 720 470 900 470 H1260" />
+                <path d="M120 250 H280 V180 H420 V245 H560 C700 245 740 145 900 145 H1130" />
+            </g>
+
+            <g class="energy-particles">
+                <circle cx="80" cy="520" r="4"><animate attributeName="cx" values="80;1120" dur="12s" repeatCount="indefinite" /></circle>
+                <circle cx="330" cy="580" r="3"><animate attributeName="cx" values="330;1180" dur="9s" repeatCount="indefinite" /></circle>
+                <circle cx="210" cy="240" r="3"><animate attributeName="cx" values="210;1080" dur="14s" repeatCount="indefinite" /></circle>
+                <circle cx="900" cy="470" r="4"><animate attributeName="cx" values="900;40" dur="11s" repeatCount="indefinite" /></circle>
+            </g>
+
+            <g class="ev-vehicle">
+                <path class="vehicle-shadow" d="M300 565 Q600 510 900 565 Q600 625 300 565Z" />
+                <path class="vehicle-body" d="M390 500 L455 420 Q485 385 545 380 L700 380 Q770 385 820 430 L875 500 L920 520 Q940 530 940 555 L940 570 L330 570 L330 535 Q330 515 355 510Z" />
+                <path class="vehicle-window" d="M480 420 L545 400 L610 400 L610 475 L440 475Z" />
+                <path class="vehicle-window" d="M625 400 L700 400 Q755 405 795 445 L820 475 L625 475Z" />
+                <path class="vehicle-detail" d="M370 510 L450 510 M790 510 L900 530" />
+                <path class="vehicle-light" d="M850 505 L900 520 L875 535 L840 525Z" />
+                <circle class="vehicle-wheel" cx="455" cy="570" r="38" />
+                <circle class="vehicle-wheel" cx="810" cy="570" r="38" />
+                <path class="vehicle-charge" d="M615 420 L590 465 L615 455 L600 500 L640 445 L615 455Z" />
+                <animateTransform attributeName="transform" type="translate" values="-28 0;28 0;-28 0" dur="18s" repeatCount="indefinite" />
+                <animateTransform attributeName="transform" additive="sum" type="rotate" values="-1 600 500;1 600 500;-1 600 500" dur="18s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.88;1;0.88" dur="4s" repeatCount="indefinite" />
+            </g>
+
+            <g class="road-grid">
+                <path d="M0 650 H1200 M0 705 H1200 M0 760 H1200" />
+                <path d="M100 620 L20 800 M300 620 L260 800 M500 620 L500 800 M700 620 L740 800 M900 620 L980 800 M1100 620 L1220 800" />
+            </g>
+            <g class="road-streaks">
+                <path d="M165 635 L120 690" />
+                <path d="M365 640 L345 715" />
+                <path d="M600 645 L600 755" />
+                <path d="M835 640 L855 715" />
+                <path d="M1035 635 L1080 690" />
+            </g>
+            <path class="road-highlight" d="M0 625 Q600 575 1200 625" />
+        </svg>
+    </div>
+
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <!-- Logo -->
+            <div class="logo">
+                ⚡
+            </div>
+
+           <h1>VOLTRIX</h1>
+
+            <p class="subtitle">
+                Continuous EV Car Monitoring System
+            </p>
+
+
+            <!-- Login Form -->
+            <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+
+                <!-- Gmail -->
+                <div class="input-group">
+
+                    <label for="email">
+                        Gmail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your Gmail"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="input-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Login Button -->
+                <button
+                    type="submit"
+                    class="auth-button"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- Register Link -->
+            <p class="switch-page">
+
+                Don't have an account?
+
+                <a href="{{ url_for('register') }}">
+                    Create Account
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
