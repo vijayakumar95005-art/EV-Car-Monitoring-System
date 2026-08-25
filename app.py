@@ -1,10 +1,11 @@
 from functools import wraps
-
+import os
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from database import get_connection
+from psycopg2.extras import RealDictCursor
 app = Flask(__name__)
-app.secret_key = "ev_monitoring_secret_key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 def login_required():
 
     if "user_id" not in session:
@@ -47,9 +48,15 @@ def password_matches(stored_password, submitted_password):
 def date_filter(column):
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+
     if not start_date or not end_date:
         return "", []
-    return f" AND {column} >= %s AND {column} < DATE_ADD(%s, INTERVAL 1 DAY)", [start_date, end_date]
+
+    return (
+        f" AND {column} >= %s "
+        f"AND {column} < (%s::date + INTERVAL '1 day')",
+        [start_date, end_date]
+    )
 
 # ==========================================
 # LOGIN
@@ -60,12 +67,19 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form["email"]
-        password = request.form["password"]
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        if not email or not password:
+            return """
+            <script>
+                alert("Please enter email and password");
+                window.location.href = "/";
+            </script>
+            """
 
         connection = get_connection()
-
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute("""
             SELECT id, name, email, password, role
@@ -78,34 +92,27 @@ def login():
         cursor.close()
         connection.close()
 
-        # Check login details
-        if user and password_matches(user["password"], password):
+        if user and password_matches(user[3], password):
 
-            # Store user information in session
-            session["user_id"] = user["id"]
-            session["name"] = user["name"]
-            session["email"] = user["email"]
-            session["role"] = user["role"]
+            session["user_id"] = user[0]
+            session["name"] = user[1]
+            session["email"] = user[2]
+            session["role"] = user[4]
 
-            # Redirect according to role
-            if user["role"] == "admin":
+            if user[4] == "admin":
                 return redirect(url_for("admin_dashboard"))
 
-            elif user["role"] == "driver":
+            elif user[4] == "driver":
                 return redirect(url_for("driver_dashboard"))
 
-        else:
-
-            return """
-            <script>
-                alert("Invalid email or password");
-                window.location.href = "/";
-            </script>
-            """
+        return """
+        <script>
+            alert("Invalid email or password");
+            window.location.href = "/";
+        </script>
+        """
 
     return render_template("login.html")
-
-
 # ==========================================
 # REGISTER
 # ==========================================
@@ -282,7 +289,7 @@ def admin_driver_behaviour():
 def driver_dashboard_api():
     """Return the newest reading for the signed-in driver's assigned vehicle."""
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     cursor.execute("""
         SELECT
             v.vehicle_number, v.make, v.model, v.status,
@@ -309,7 +316,7 @@ def driver_dashboard_api():
 @driver_api_required
 def driver_vehicles_api():
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     cursor.execute("""
         SELECT vehicle_number, make, model
         FROM vehicles
@@ -326,7 +333,7 @@ def driver_vehicles_api():
 @driver_api_required
 def driver_predictions_api():
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
 
     if request.method == "GET":
         cursor.execute("""
@@ -470,7 +477,7 @@ def dashboard_api():
 @admin_api_required
 def admin_alerts_api():
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute("""
         SELECT v.vehicle_number, v.make, v.model,
@@ -512,7 +519,7 @@ def admin_alerts_api():
 def vehicles_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("vr.recorded_at")
     company = request.args.get("company", "").strip()
     if company:
@@ -573,7 +580,7 @@ def vehicles_api():
 def electricity_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     filter_sql, filter_params = date_filter("vr.recorded_at")
     cursor.execute("""
@@ -627,7 +634,7 @@ def electricity_api():
 def electricity_summary():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     filter_sql, filter_params = date_filter("recorded_at")
 
@@ -771,7 +778,7 @@ def electricity_summary():
 def electricity_analysis():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
 
     # ==========================================
     # HIGHEST CONSUMER
@@ -882,7 +889,7 @@ def electricity_analysis():
 def maintenance_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     filter_sql, filter_params = date_filter("m.maintenance_date")
     cursor.execute("""
@@ -914,7 +921,7 @@ def maintenance_api():
 def maintenance_summary():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("maintenance_date")
 
     # ==========================================
@@ -1035,7 +1042,7 @@ def maintenance_summary():
 def revenue_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     filter_sql, filter_params = date_filter("r.revenue_date")
     distance_filter_sql, distance_filter_params = date_filter("vr.recorded_at")
@@ -1075,7 +1082,7 @@ def revenue_api():
 @admin_api_required
 def revenue_by_make_api():
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("r.revenue_date")
     cursor.execute("""
         SELECT v.make, COUNT(DISTINCT v.id) AS vehicles,
@@ -1098,7 +1105,7 @@ def revenue_by_make_api():
 def revenue_summary():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     filter_sql, filter_params = date_filter("revenue_date")
 
@@ -1213,7 +1220,7 @@ def revenue_summary():
 def driver_behaviour_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("vr.recorded_at")
 
     cursor.execute("""
@@ -1262,7 +1269,7 @@ def driver_behaviour_api():
 def driving_events_api():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     filter_sql, filter_params = date_filter("vr.recorded_at")
 
     cursor.execute("""
@@ -1302,7 +1309,7 @@ def driving_events_api():
 def driver_behaviour_summary():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     # --------------------------------------
     # TOTAL DRIVER READINGS
@@ -1396,7 +1403,7 @@ def driver_behaviour_summary():
 def driver_behaviour_metrics():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("recorded_at")
 
     cursor.execute("""
@@ -1452,7 +1459,7 @@ def driver_behaviour_metrics():
 def high_risk_driver():
 
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
     filter_sql, filter_params = date_filter("vr.recorded_at")
 
     cursor.execute("""
@@ -1557,4 +1564,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

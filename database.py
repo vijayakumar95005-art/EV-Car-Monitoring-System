@@ -1,30 +1,23 @@
 import os
-
-import mysql.connector
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 def get_connection():
-
-    connection = mysql.connector.connect(
-    host=os.environ["DB_HOST"],
-    port=int(os.environ["DB_PORT"]),
-    user=os.environ["DB_USER"],
-    password=os.environ["DB_PASSWORD"],
-    database=os.environ["DB_NAME"]
-)
-
-    return connection
+    return psycopg2.connect(
+        host=os.environ["DB_HOST"],
+        port=os.environ.get("DB_PORT", "5432"),
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        dbname=os.environ.get("DB_NAME", "postgres")
+    )
 
 
 if __name__ == "__main__":
-
     connection = get_connection()
-
-    if connection.is_connected():
-        print("MySQL connected successfully!")
-
+    print("PostgreSQL connected successfully!")
     connection.close()
-
+    print("Connection closed.")
